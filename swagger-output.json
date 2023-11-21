@@ -31,6 +31,9 @@
               "properties": {
                 "survey_title": {
                   "example": "any"
+                },
+                "survey_detail": {
+                  "example": "any"
                 }
               }
             }
@@ -132,6 +135,12 @@
                 },
                 "question_content": {
                   "example": "any"
+                },
+                "is_multiple": {
+                  "example": "any"
+                },
+                "ans_num_allowed": {
+                  "example": "any"
                 }
               }
             }
@@ -144,12 +153,12 @@
         }
       }
     },
-    "/question/all/{id}": {
+    "/question/all/{survey_id}": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -162,12 +171,12 @@
         }
       }
     },
-    "/question/one/{id}/{num}": {
+    "/question/one/{survey_id}/{num}": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -216,12 +225,12 @@
         }
       }
     },
-    "/question/{id}/{num}": {
+    "/question/{survey_id}/{num}": {
       "delete": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -231,33 +240,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/question/createtest": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "survey_id": {
-                  "example": "any"
-                },
-                "ans_json": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -303,12 +285,12 @@
         }
       }
     },
-    "/choice/all/{id}/{question_num}": {
+    "/choice/all/{survey_id}/{question_num}": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -327,12 +309,12 @@
         }
       }
     },
-    "/choice/one/{id}/{question_num}/{choice_num}": {
+    "/choice/one/{survey_id}/{question_num}/{choice_num}": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -393,12 +375,12 @@
         }
       }
     },
-    "/choice/delete/{id}/{question_num}/{choice_num}": {
+    "/choice/delete/{survey_id}/{question_num}/{choice_num}": {
       "delete": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "survey_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -459,29 +441,9 @@
     "/answer/createArray": {
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "tester_id": {
-                  "example": "any"
-                },
-                "survey_id": {
-                  "example": "any"
-                },
-                "ans_obj_array": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -496,10 +458,16 @@
         }
       }
     },
-    "/tester/one/{tester_id}": {
+    "/tester/one/{survey_id}/{tester_id}": {
       "get": {
         "description": "",
         "parameters": [
+          {
+            "name": "survey_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "tester_id",
             "in": "path",
@@ -529,6 +497,33 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/tester/update": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tester_id": {
+                  "example": "any"
+                },
+                "is_finished": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {

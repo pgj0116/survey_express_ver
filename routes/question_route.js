@@ -9,9 +9,9 @@ const {
 } = require("../controllers/question_controller");
 
 router.post("/create", createQuestion);
-router.get("/all/:id", readAllQuestion);
-router.get("/one/:id/:num", readOneQuestion);
+router.get("/all/:survey_id", readAllQuestion);
+router.get("/one/:survey_id/:question_num", readOneQuestion);
 router.patch("/update", updateQuestion);
-router.delete("/:id/:num", deleteQuestion);
+router.delete("/:survey_id/:question_num", deleteQuestion);
 
 module.exports = router;

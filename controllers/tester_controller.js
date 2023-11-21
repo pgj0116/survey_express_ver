@@ -18,7 +18,7 @@ module.exports = {
       } catch (err) {
         await con.rollback();
         logger.info({
-          ERROR: "[createTester] " + err.message,
+          ERROR: "[createTester]" + err.message,
         });
         return res.send({ ERROR: "[createTester] " + err.message });
       } finally {
@@ -26,14 +26,16 @@ module.exports = {
       }
     } catch (err) {
       logger.info({
-        ERROR: "[createTester] " + err.message,
+        ERROR: "[createTester]" + err.message,
       });
-      return res.send({ ERROR: "[createTester] " + err.message });
+      return res.send({ ERROR: "[createTester]" + err.message });
     }
   },
   readOneTester: async (req, res) => {
     try {
       const tester_id = req.params.tester_id;
+      const survey_id = req.params.survey_id;
+
       const con = await pool.getConnection(async (conn) => conn);
       try {
         const [chk1] = await con.query(
@@ -52,8 +54,10 @@ module.exports = {
              ON c.survey_id = a.survey_id
              AND c.question_num = a.question_num
              AND c.choice_num = a.sel_choice  
-                WHERE a.tester_id = ?`,
-          tester_id
+             WHERE a.tester_id = ?
+             AND survey_id = ?
+             ORDER BY a.question_num`,
+          [tester_id, survey_id]
         );
         let points = 0;
         survey_data.forEach((el) => {
@@ -63,17 +67,17 @@ module.exports = {
         return res.send({ DATA: survey_data, TOTAL_POINT: points });
       } catch (err) {
         logger.info({
-          ERROR: "[readOneSurvey] " + err.message,
+          ERROR: "[readOneSurvey]" + err.message,
         });
-        return res.send({ ERROR: "[readOneSurvey] " + err.message });
+        return res.send({ ERROR: "[readOneSurvey]" + err.message });
       } finally {
         await con.release();
       }
     } catch (err) {
       logger.info({
-        ERROR: "[readOneSurvey] " + err.message,
+        ERROR: "[readOneSurvey]" + err.message,
       });
-      return res.send({ ERROR: "[readOneSurvey] " + err.message });
+      return res.send({ ERROR: "[readOneSurvey]" + err.message });
     }
   },
   readScoreByTester: async (req, res) => {
@@ -83,6 +87,18 @@ module.exports = {
 
       const con = await pool.getConnection(async (conn) => conn);
       try {
+        const [tester_chk] = await con.query(
+          `SELECT is_finished FROM Tester WHERE tester_id = ?`,
+          [tester_id]
+        );
+        if (tester_chk[0].is_finished === 0) {
+          logger.info({
+            ERROR: "[readScoreByTester]The survey hasn't finished yet",
+          });
+          return res.send({
+            ERROR: "[readScoreByTester]The survey hasn't finished yet",
+          });
+        }
         const [point_data] = await con.query(
           `SELECT * FROM Answer a 
             JOIN Choice c
@@ -94,18 +110,24 @@ module.exports = {
         );
         return res.send({ DATA: point_data[0] });
       } catch (err) {
+        logger.info({
+          ERROR: "[readScoreByTester] " + err.message,
+        });
         return res.send({ ERROR: "[readScoreByTester] " + err.message });
       } finally {
         await con.release();
       }
     } catch (err) {
+      logger.info({
+        ERROR: "[readScoreByTester] " + err.message,
+      });
       return res.send({ ERROR: "[readScoreByTester] " + err.message });
     }
   },
   readCountByQuestion: async (req, res) => {
     try {
-      const tester_id = req.params.tester_id;
       const survey_id = req.params.survey_id;
+      const question_num = req.params.question_num;
 
       const con = await pool.getConnection(async (conn) => conn);
       try {
@@ -126,6 +148,36 @@ module.exports = {
       }
     } catch (err) {
       return res.send({ ERROR: "[readScoreByTester] " + err.message });
+    }
+  },
+  updateTesterStatus: async (req, res) => {
+    try {
+      const { tester_id, is_finished } = req.body;
+
+      const con = await pool.getConnection(async (conn) => conn);
+      try {
+        const [chk1] = await con.query(
+          `SELECT * FROM Tester WHERE tester_id = ?`,
+          [tester_id]
+        );
+        if (chk1.length === 0) {
+          return res.send({
+            ERROR: "[updateTesterStatus]The tester doesn't exist",
+          });
+        }
+        await con.query(
+          `UPDATE Tester SET is_finished = ?
+                          WHERE tester_id = ?`,
+          [tester_id, is_finished]
+        );
+        return res.send({ SUCCESS: "The status is successfully updated" });
+      } catch (err) {
+        return res.send({ ERROR: "[updateTesterStatus] " + err.message });
+      } finally {
+        await con.release();
+      }
+    } catch (err) {
+      return res.send({ ERROR: "[updateTesterStatus] " + err.message });
     }
   },
 };

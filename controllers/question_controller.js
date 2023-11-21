@@ -4,7 +4,13 @@ const logger = require("../winston/logger");
 module.exports = {
   createQuestion: async (req, res) => {
     try {
-      const { survey_id, question_num, question_content } = req.body;
+      const {
+        survey_id,
+        question_num,
+        question_content,
+        is_multiple,
+        ans_num_allowed,
+      } = req.body;
       if (!survey_id || !question_num || !question_content) {
         logger.info({
           ERROR: "[createQuestion]" + "Some component(s) is(are) missing",
@@ -39,8 +45,15 @@ module.exports = {
         }
         await con.beginTransaction();
         await con.query(
-          `INSERT INTO Question(survey_id, question_num, question_content) VALUES (?,?,?)`,
-          [survey_id, question_num, question_content]
+          `INSERT INTO Question(survey_id, question_num, question_content, is_multiple,
+        ans_num_allowed) VALUES (?,?,?,?,?)`,
+          [
+            survey_id,
+            question_num,
+            question_content,
+            is_multiple || 1,
+            ans_num_allowed || 1,
+          ]
         );
         await con.commit();
         return res.send({ SUCCESS: "A Question is successfully created" });
@@ -63,7 +76,7 @@ module.exports = {
   },
   readAllQuestion: async (req, res) => {
     try {
-      const survey_id = req.params.id;
+      const survey_id = req.params.survey_id;
       const con = await pool.getConnection(async (conn) => conn);
       try {
         const [question_data] = await con.query(
@@ -89,8 +102,8 @@ module.exports = {
 
   readOneQuestion: async (req, res) => {
     try {
-      const survey_id = req.params.id;
-      const question_num = req.params.num;
+      const survey_id = req.params.survey_id;
+      const question_num = req.params.question_num;
       const con = await pool.getConnection(async (conn) => conn);
       try {
         const [question_data] = await con.query(
@@ -164,8 +177,8 @@ module.exports = {
   },
   deleteQuestion: async (req, res) => {
     try {
-      const survey_id = req.params.id;
-      const question_num = req.params.num;
+      const survey_id = req.params.survey_id;
+      const question_num = req.params.question_num;
       const con = await pool.getConnection(async (conn) => conn);
       try {
         const [chk1] = await con.query(

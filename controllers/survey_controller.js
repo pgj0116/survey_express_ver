@@ -4,7 +4,7 @@ const logger = require("../winston/logger");
 module.exports = {
   createSurvey: async (req, res) => {
     try {
-      const { survey_title } = req.body;
+      const { survey_title, survey_detail } = req.body;
       if (!susrvey_title) {
         logger.info({
           ERROR: "[createSurvey]Some component(s) is(are) missing",
@@ -17,8 +17,8 @@ module.exports = {
       try {
         await con.beginTransaction();
         await con.query(
-          `INSERT INTO Survey(survey_title) VALUES (?)`,
-          survey_title
+          `INSERT INTO Survey(survey_title, survey_detail) VALUES (?, ?)`,
+          [survey_title, survey_detail || ""]
         );
         await con.commit();
         return res.send({ SUCCESS: "A survey is successfully created" });
