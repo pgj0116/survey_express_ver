@@ -81,3 +81,5 @@
 6. GET choice/one/:survey_id/:question_num/:choice_num: 특정질문 특정 선택 조회
 7. GET tester/one/:survey_id/:tester_id: 특정 응답자 모든 응답 조회
 8. GET tester/score/:survey_id/:tester_id:특정 응답자의 점수 조회(응답자의 상태가 완료여야지 점수 조회 가능)
+
+#### 삭제 및 업데이트는 Swagger 참조
